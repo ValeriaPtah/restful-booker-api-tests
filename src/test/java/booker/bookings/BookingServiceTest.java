@@ -1,9 +1,9 @@
 package booker.bookings;
 
-import static io.restassured.RestAssured.config;
 import static io.restassured.RestAssured.given;
-import static io.restassured.config.EncoderConfig.encoderConfig;
 import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.hasToString;
+import static org.hamcrest.Matchers.notNullValue;
 
 import booker.BaseBookerTest;
 import booker.model.BookingInfo;
@@ -16,7 +16,6 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import java.util.List;
 import org.apache.commons.lang3.RandomUtils;
-import org.hamcrest.Matchers;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -27,6 +26,7 @@ public class BookingServiceTest extends BaseBookerTest {
     RestAssured.basePath = "/booking";
     RestAssured.responseSpecification = new ResponseSpecBuilder()
         .expectStatusCode(200)
+        .expectContentType(ContentType.JSON)
         .build();
   }
 
@@ -40,7 +40,7 @@ public class BookingServiceTest extends BaseBookerTest {
         .when()
         .get()
         .then()
-        .contentType(ContentType.JSON);
+        .body("bookingid", notNullValue());
   }
 
   @Test
@@ -56,28 +56,15 @@ public class BookingServiceTest extends BaseBookerTest {
         .when()
         .get(bookingIDpath)
         .then()
-        .contentType(ContentType.JSON)
         .body("$", hasKey("bookingdates"));
   }
 
   @Test
   public void canCreateBooking() {
-    BookingInfo bookingInfo = BookingInfo.builder()
-        .firstName("Jane")
-        .lastName("Doe")
-        .totalPrice(42)
-        .depositPaid(true)
-        .bookingDates(CheckInOutDate.builder()
-            .checkIn("2020-11-11")
-            .checkOut("2020-11-12")
-            .build())
-        .additionalNeeds("Wakeup Call")
-        .build();
+    BookingInfo bookingInfo = bookingEntry();
 
     RequestSpecification requestSpec = new RequestSpecBuilder()
         .addHeader("content-type", ContentType.JSON.toString())
-        .setConfig(
-            config().encoderConfig(encoderConfig().encodeContentTypeAs("Accept: application/json", ContentType.JSON)))
         .setBody(BookingInfo.toJson(bookingInfo))
         .build();
 
@@ -85,19 +72,17 @@ public class BookingServiceTest extends BaseBookerTest {
         .when()
         .post()
         .then()
-        .contentType(ContentType.JSON);
+        .body("booking.firstname",
+            hasToString(bookingInfo.getFirstName()));
   }
 
   @Test
   public void canUpdateBooking() {
     String bookingID = randomBookingID();
-
     BookingInfo bookingInfo = bookingEntry();
 
     RequestSpecification requestSpec = new RequestSpecBuilder()
         .addHeader("content-type", ContentType.JSON.toString())
-        .setConfig(
-            config().encoderConfig(encoderConfig().encodeContentTypeAs("Accept: application/json", ContentType.JSON)))
         .addCookie("token", token())
         .setBody(BookingInfo.toJson(bookingInfo))
         .build();
@@ -106,15 +91,14 @@ public class BookingServiceTest extends BaseBookerTest {
         .when()
         .put("/" + bookingID)
         .then()
-        .contentType(ContentType.JSON);
+        .body("firstname",
+            hasToString(bookingInfo.getFirstName()));
   }
 
   @Test
   public void canPatchBooking() {
     RequestSpecification requestSpec = new RequestSpecBuilder()
         .addHeader("content-type", ContentType.JSON.toString())
-        .setConfig(
-            config().encoderConfig(encoderConfig().encodeContentTypeAs("Accept: application/json", ContentType.JSON)))
         .addCookie("token", token())
         .setBody("{ \"firstname\" : \"Jane\", \"lastname\" : \"Doe\"}")
         .build();
@@ -125,8 +109,7 @@ public class BookingServiceTest extends BaseBookerTest {
         .when()
         .patch("/" + bookingID)
         .then()
-        .contentType(ContentType.JSON)
-        .body("firstname", Matchers.hasToString("Jane"));
+        .body("firstname", hasToString("Jane"));
   }
 
   private static String token() {
@@ -163,4 +146,5 @@ public class BookingServiceTest extends BaseBookerTest {
         .additionalNeeds("WakeupCall")
         .build();
   }
+
 }
