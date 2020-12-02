@@ -11,32 +11,32 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class NegativeBookingServiceTest extends BaseBookerTest {
 
-  private static final String BASE_PATH = "/booking";
+  @BeforeClass
+  private static void setup() {
+    RestAssured.basePath = "/booking";
+  }
 
   @Test
   public void cannotPatchWithoutToken() {
     String bookingIDpath =
         "/" + given().header("content-type", ContentType.JSON.toString())
-            .get(BASE_PATH).then().extract().response().jsonPath().getString("bookingid[0]");
-
-    BookingInfo bookingInfo = BookingInfo.builder()
-        .firstname("Jane")
-        .build();
+            .get().then().extract().response().jsonPath().getString("bookingid[0]");
 
     RequestSpecification requestSpec = new RequestSpecBuilder()
         .addHeader("content-type", ContentType.JSON.toString())
         .setConfig(
             config().encoderConfig(encoderConfig().encodeContentTypeAs("Accept: application/json", ContentType.TEXT)))
-        .setBody(bookingInfo)
+        .setBody("{ \"firstname\" : \"Jane\", \"lastname\" : \"Doe\"}")
         .build();
 
     RestAssured.given(requestSpec)
         .when()
-        .patch(BASE_PATH + bookingIDpath)
+        .patch(bookingIDpath)
         .then()
         .statusCode(403);
   }
@@ -45,7 +45,7 @@ public class NegativeBookingServiceTest extends BaseBookerTest {
   public void cannotUpdateWithoutToken() {
     String bookingIDpath =
         "/" + given().header("content-type", ContentType.JSON.toString())
-            .get(BASE_PATH).then().extract().response().jsonPath().getString("bookingid[0]");
+            .get().then().extract().response().jsonPath().getString("bookingid[0]");
 
     BookingInfo bookingInfo = BookingInfo.builder()
         .firstname("Jane")
@@ -68,7 +68,7 @@ public class NegativeBookingServiceTest extends BaseBookerTest {
 
     RestAssured.given(requestSpec)
         .when()
-        .put(BASE_PATH + bookingIDpath)
+        .put(bookingIDpath)
         .then()
         .statusCode(403);
   }

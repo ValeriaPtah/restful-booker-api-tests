@@ -11,14 +11,16 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class NegativeAuthServiceTest extends BaseBookerTest {
 
-  private static final String BASE_PATH = "/auth";
   private static final String BAD_CREDS = "Bad credentials";
 
-  static {
+  @BeforeClass
+  private static void setup() {
+    RestAssured.basePath = "/auth";
     RestAssured.responseSpecification = new ResponseSpecBuilder()
         .expectContentType(ContentType.JSON)
         .build();
@@ -34,7 +36,7 @@ public class NegativeAuthServiceTest extends BaseBookerTest {
 
     RestAssured.given(requestSpec)
         .when()
-        .post(BASE_PATH)
+        .post()
         .then()
         .body("$", hasValue(BAD_CREDS));
   }
@@ -54,7 +56,7 @@ public class NegativeAuthServiceTest extends BaseBookerTest {
     RestAssured.given(requestSpec)
         .when()
         .body(creds)
-        .post(BASE_PATH)
+        .post()
         .then()
         .body("$", hasValue(BAD_CREDS));
   }
@@ -74,7 +76,7 @@ public class NegativeAuthServiceTest extends BaseBookerTest {
     RestAssured.given(requestSpec)
         .when()
         .body(creds)
-        .post(BASE_PATH)
+        .post()
         .then()
         .body("$", hasValue(BAD_CREDS));
   }
@@ -95,7 +97,7 @@ public class NegativeAuthServiceTest extends BaseBookerTest {
     RestAssured.given(requestSpec)
         .when()
         .body(creds)
-        .post(BASE_PATH)
+        .post()
         .then()
         .body("$", hasValue(BAD_CREDS));
   }
@@ -116,7 +118,7 @@ public class NegativeAuthServiceTest extends BaseBookerTest {
     RestAssured.given(requestSpec)
         .when()
         .body(creds)
-        .post(BASE_PATH)
+        .post()
         .then()
         .body("$", hasValue(BAD_CREDS));
   }
@@ -137,7 +139,7 @@ public class NegativeAuthServiceTest extends BaseBookerTest {
     RestAssured.given(requestSpec)
         .when()
         .body(creds)
-        .post(BASE_PATH)
+        .post()
         .then()
         .body("$", hasValue(BAD_CREDS));
   }

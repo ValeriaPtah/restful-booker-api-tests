@@ -1,6 +1,7 @@
 package booker;
 
 import io.restassured.RestAssured;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 
 public class BaseBookerTest {
@@ -11,6 +12,12 @@ public class BaseBookerTest {
     RestAssured
         .filters(new io.restassured.filter.log.RequestLoggingFilter(),
             new io.restassured.filter.log.ResponseLoggingFilter());
+  }
+
+  @AfterClass
+  public void after() {
+    RestAssured.basePath = "";
+    RestAssured.responseSpecification = null;
   }
 
 }

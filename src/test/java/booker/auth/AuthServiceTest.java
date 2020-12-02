@@ -10,13 +10,14 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class AuthServiceTest extends BaseBookerTest {
 
-  private static final String BASE_PATH = "/auth";
-
-  static {
+  @BeforeClass
+  private static void setup() {
+    RestAssured.basePath = "/auth";
     RestAssured.responseSpecification = new ResponseSpecBuilder()
         .expectContentType(ContentType.JSON)
         .expectStatusCode(200)
@@ -34,7 +35,7 @@ public class AuthServiceTest extends BaseBookerTest {
 
     RestAssured.given(requestSpec)
         .when()
-        .post(BASE_PATH)
+        .post()
         .then()
         .body("$", hasKey("token"));
   }

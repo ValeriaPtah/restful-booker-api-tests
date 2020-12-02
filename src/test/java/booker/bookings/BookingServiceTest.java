@@ -4,7 +4,6 @@ import static io.restassured.RestAssured.config;
 import static io.restassured.RestAssured.given;
 import static io.restassured.config.EncoderConfig.encoderConfig;
 import static org.hamcrest.Matchers.hasKey;
-import static org.hamcrest.Matchers.hasValue;
 
 import booker.BaseBookerTest;
 import booker.model.BookingInfo;
@@ -17,13 +16,15 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import java.util.List;
 import org.apache.commons.lang3.RandomUtils;
+import org.hamcrest.Matchers;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class BookingServiceTest extends BaseBookerTest {
 
-  private static final String BASE_PATH = "/booking";
-
-  static {
+  @BeforeClass
+  private static void setup() {
+    RestAssured.basePath = "/booking";
     RestAssured.responseSpecification = new ResponseSpecBuilder()
         .expectStatusCode(200)
         .build();
@@ -37,7 +38,7 @@ public class BookingServiceTest extends BaseBookerTest {
 
     given(requestSpec)
         .when()
-        .get(BASE_PATH)
+        .get()
         .then()
         .contentType(ContentType.JSON);
   }
@@ -49,11 +50,11 @@ public class BookingServiceTest extends BaseBookerTest {
         .build();
 
     String bookingIDpath =
-        "/" + given(requestSpec).get(BASE_PATH).then().extract().response().jsonPath().getString("bookingid[0]");
+        "/" + given(requestSpec).get().then().extract().response().jsonPath().getString("bookingid[0]");
 
     given(requestSpec)
         .when()
-        .get(BASE_PATH + bookingIDpath)
+        .get(bookingIDpath)
         .then()
         .contentType(ContentType.JSON)
         .body("$", hasKey("bookingdates"));
@@ -82,7 +83,7 @@ public class BookingServiceTest extends BaseBookerTest {
 
     RestAssured.given(requestSpec)
         .when()
-        .post(BASE_PATH)
+        .post()
         .then()
         .contentType(ContentType.JSON);
   }
@@ -91,17 +92,7 @@ public class BookingServiceTest extends BaseBookerTest {
   public void canUpdateBooking() {
     String bookingID = randomBookingID();
 
-    BookingInfo bookingInfo = BookingInfo.builder()
-        .firstname("Jane")
-        .lastname("Doe")
-        .totalprice(42)
-        .depositpaid(true)
-        .bookingdates(CheckInOutDate.builder()
-            .checkin("2020-11-11")
-            .checkout("2020-11-13")
-            .build())
-        .additionalneeds("WakeupCall")
-        .build();
+    BookingInfo bookingInfo = bookingEntry();
 
     RequestSpecification requestSpec = new RequestSpecBuilder()
         .addHeader("content-type", ContentType.JSON.toString())
@@ -113,7 +104,7 @@ public class BookingServiceTest extends BaseBookerTest {
 
     RestAssured.given(requestSpec)
         .when()
-        .put(BASE_PATH + "/" + bookingID)
+        .put("/" + bookingID)
         .then()
         .contentType(ContentType.JSON);
   }
@@ -125,47 +116,51 @@ public class BookingServiceTest extends BaseBookerTest {
         .setConfig(
             config().encoderConfig(encoderConfig().encodeContentTypeAs("Accept: application/json", ContentType.JSON)))
         .addCookie("token", token())
+        .setBody("{ \"firstname\" : \"Jane\", \"lastname\" : \"Doe\"}")
         .build();
 
     String bookingID = randomBookingID();
-    Response initInfo = given(requestSpec)
-        .when()
-        .get(BASE_PATH + bookingID);
-
-    BookingInfo updateInfo = BookingInfo.builder()
-        .firstname("Jane")
-        .lastname("Doe")
-        .build();
 
     RestAssured.given(requestSpec)
         .when()
-        .body(updateInfo)
-        .patch(BASE_PATH + "/" + bookingID)
+        .patch("/" + bookingID)
         .then()
         .contentType(ContentType.JSON)
-        .body("firstname", hasValue(updateInfo.getFirstname()));
-
-    RestAssured.given(requestSpec)
-        .when()
-        .body(initInfo)
-        .patch(BASE_PATH + "/" + bookingID);
+        .body("firstname", Matchers.hasToString("Jane"));
   }
 
   private static String token() {
     RequestSpecification requestSpec = new RequestSpecBuilder()
         .addHeader("content-type", ContentType.JSON.toString())
         .setBody("{ \"username\" : \"admin\", \"password\" : \"password123\"}")
-        .setConfig(
-            config().encoderConfig(encoderConfig().encodeContentTypeAs("Accept: application/json", ContentType.TEXT)))
         .build();
 
     return given(requestSpec).post("https://restful-booker.herokuapp.com/auth").path("token");
   }
 
   private static String randomBookingID() {
-    Response resp = given().header("content-type", ContentType.JSON.toString())
-        .get(BASE_PATH).then().extract().response();
+    Response resp = given()
+        .header("content-type", ContentType.JSON.toString())
+        .get()
+        .then()
+        .extract()
+        .response();
     List<String> bookingIDs = resp.jsonPath().getList("$");
-    return resp.jsonPath().getString("bookingid[" + RandomUtils.nextInt(0, bookingIDs.size()) + "]");
+    return resp.jsonPath()
+        .getString("bookingid[" + RandomUtils.nextInt(0, bookingIDs.size()) + "]");
+  }
+
+  private static BookingInfo bookingEntry() {
+    return BookingInfo.builder()
+        .firstname("Jane")
+        .lastname("Doe")
+        .totalprice(42)
+        .depositpaid(true)
+        .bookingdates(CheckInOutDate.builder()
+            .checkin("2020-11-11")
+            .checkout("2020-11-13")
+            .build())
+        .additionalneeds("WakeupCall")
+        .build();
   }
 }
