@@ -48,15 +48,15 @@ public class NegativeBookingServiceTest extends BaseBookerTest {
             .get().then().extract().response().jsonPath().getString("bookingid[0]");
 
     BookingInfo bookingInfo = BookingInfo.builder()
-        .firstname("Jane")
-        .lastname("Doe")
-        .totalprice(42)
-        .depositpaid(true)
-        .bookingdates(CheckInOutDate.builder()
-            .checkin("2020-11-11")
-            .checkout("2020-11-13")
+        .firstName("Jane")
+        .lastName("Doe")
+        .totalPrice(42)
+        .depositPaid(true)
+        .bookingDates(CheckInOutDate.builder()
+            .checkIn("2020-11-11")
+            .checkOut("2020-11-13")
             .build())
-        .additionalneeds("WakeupCall")
+        .additionalNeeds("WakeupCall")
         .build();
 
     RequestSpecification requestSpec = new RequestSpecBuilder()

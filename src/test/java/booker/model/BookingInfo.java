@@ -1,6 +1,8 @@
 package booker.model;
 
 import com.squareup.moshi.Json;
+import com.squareup.moshi.JsonAdapter;
+import com.squareup.moshi.Moshi;
 import lombok.Builder;
 import lombok.Value;
 
@@ -9,33 +11,39 @@ import lombok.Value;
 public class BookingInfo {
 
   @Json(name = "firstname")
-  String firstname;
+  String firstName;
 
   @Json(name = "lastname")
-  String lastname;
+  String lastName;
 
   @Json(name = "totalprice")
-  Integer totalprice;
+  Integer totalPrice;
 
   @Json(name = "depositpaid")
-  Boolean depositpaid;
+  Boolean depositPaid;
 
   @Json(name = "bookingdates")
-  CheckInOutDate bookingdates;
+  CheckInOutDate bookingDates;
 
   @Json(name = "additionalneeds")
-  String additionalneeds;
+  String additionalNeeds;
 
   @Value
   @Builder
   public static class CheckInOutDate {
 
     @Json(name = "checkin")
-    String checkin;
+    String checkIn;
 
     @Json(name = "checkout")
-    String checkout;
+    String checkOut;
 
+  }
+
+  public static String toJson(BookingInfo info) {
+    Moshi moshi = new Moshi.Builder().build();
+    JsonAdapter<BookingInfo> jsonAdapter = moshi.adapter(BookingInfo.class);
+    return jsonAdapter.toJson(info);
   }
 
 }

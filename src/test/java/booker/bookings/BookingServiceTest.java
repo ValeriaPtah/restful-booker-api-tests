@@ -63,22 +63,22 @@ public class BookingServiceTest extends BaseBookerTest {
   @Test
   public void canCreateBooking() {
     BookingInfo bookingInfo = BookingInfo.builder()
-        .firstname("Jane")
-        .lastname("Doe")
-        .totalprice(42)
-        .depositpaid(true)
-        .bookingdates(CheckInOutDate.builder()
-            .checkin("2020-11-11")
-            .checkout("2020-11-12")
+        .firstName("Jane")
+        .lastName("Doe")
+        .totalPrice(42)
+        .depositPaid(true)
+        .bookingDates(CheckInOutDate.builder()
+            .checkIn("2020-11-11")
+            .checkOut("2020-11-12")
             .build())
-        .additionalneeds("Wakeup Call")
+        .additionalNeeds("Wakeup Call")
         .build();
 
     RequestSpecification requestSpec = new RequestSpecBuilder()
         .addHeader("content-type", ContentType.JSON.toString())
         .setConfig(
             config().encoderConfig(encoderConfig().encodeContentTypeAs("Accept: application/json", ContentType.JSON)))
-        .setBody(bookingInfo)
+        .setBody(BookingInfo.toJson(bookingInfo))
         .build();
 
     RestAssured.given(requestSpec)
@@ -99,7 +99,7 @@ public class BookingServiceTest extends BaseBookerTest {
         .setConfig(
             config().encoderConfig(encoderConfig().encodeContentTypeAs("Accept: application/json", ContentType.JSON)))
         .addCookie("token", token())
-        .setBody(bookingInfo)
+        .setBody(BookingInfo.toJson(bookingInfo))
         .build();
 
     RestAssured.given(requestSpec)
@@ -152,15 +152,15 @@ public class BookingServiceTest extends BaseBookerTest {
 
   private static BookingInfo bookingEntry() {
     return BookingInfo.builder()
-        .firstname("Jane")
-        .lastname("Doe")
-        .totalprice(42)
-        .depositpaid(true)
-        .bookingdates(CheckInOutDate.builder()
-            .checkin("2020-11-11")
-            .checkout("2020-11-13")
+        .firstName("Jane")
+        .lastName("Doe")
+        .totalPrice(42)
+        .depositPaid(true)
+        .bookingDates(CheckInOutDate.builder()
+            .checkIn("2020-11-11")
+            .checkOut("2020-11-13")
             .build())
-        .additionalneeds("WakeupCall")
+        .additionalNeeds("WakeupCall")
         .build();
   }
 }
