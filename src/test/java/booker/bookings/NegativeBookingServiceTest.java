@@ -25,7 +25,8 @@ public class NegativeBookingServiceTest extends BaseBookerTest {
   public void cannotPatchWithoutToken() {
     String bookingIDpath =
         "/" + given().header("content-type", ContentType.JSON.toString())
-            .get().then().extract().response().jsonPath().getString("bookingid[0]");
+            .get().then().extract().response()
+            .jsonPath().getString("bookingid[0]");
 
     RequestSpecification requestSpec = new RequestSpecBuilder()
         .addHeader("content-type", ContentType.JSON.toString())
@@ -45,7 +46,8 @@ public class NegativeBookingServiceTest extends BaseBookerTest {
   public void cannotUpdateWithoutToken() {
     String bookingIDpath =
         "/" + given().header("content-type", ContentType.JSON.toString())
-            .get().then().extract().response().jsonPath().getString("bookingid[0]");
+            .get().then().extract().response()
+            .jsonPath().getString("bookingid[0]");
 
     BookingInfo bookingInfo = BookingInfo.builder()
         .firstName("Jane")
