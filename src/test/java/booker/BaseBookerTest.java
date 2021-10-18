@@ -6,18 +6,19 @@ import org.testng.annotations.BeforeClass;
 
 public class BaseBookerTest {
 
-  @BeforeClass
-  public void before() {
-    RestAssured.baseURI = "https://restful-booker.herokuapp.com/";
-    RestAssured
-        .filters(new io.restassured.filter.log.RequestLoggingFilter(),
-            new io.restassured.filter.log.ResponseLoggingFilter());
-  }
+    @BeforeClass
+    public static void before() {
+        RestAssured.baseURI = "https://restful-booker.herokuapp.com/";
+        RestAssured
+                .filters(new io.restassured.filter.log.RequestLoggingFilter(),
+                        new io.restassured.filter.log.ResponseLoggingFilter());
+    }
 
-  @AfterClass
-  public void after() {
-    RestAssured.basePath = "";
-    RestAssured.responseSpecification = null;
-  }
+    @AfterClass
+    public static void after() {
+        RestAssured.basePath = "";
+        RestAssured.requestSpecification = null;
+        RestAssured.responseSpecification = null;
+    }
 
 }

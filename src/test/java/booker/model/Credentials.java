@@ -5,13 +5,13 @@ import lombok.Builder;
 import lombok.Value;
 
 @Value
-@Builder(toBuilder = true)
+@Builder
 public class Credentials {
 
-  @Json(name = "username")
-  String username;
+    @Json(name = "username")
+    String username;
 
-  @Json(name = "password")
-  String password;
+    @Json(name = "password")
+    String password;
 
 }
