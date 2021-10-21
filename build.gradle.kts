@@ -14,9 +14,6 @@ repositories {
 
 //Versions
 val commonsLang3Version = "3.12.0"
-val groovyVersion = "3.0.8"
-val jacksonVersion = "2.13.0"
-val jaxbVersion = "2.4.0-b180830.0359"
 val lombokVersion = "1.18.22"
 val moshiVersion = "1.12.0"
 val restAssuredVersion = "4.4.0"
